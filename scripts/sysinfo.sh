@@ -68,7 +68,7 @@ modinfo hid >> kernel_drivers.txt 2>&1
 echo "  * Kernel device information..."
 DEVFIND=$(find /sys/devices -type d -iregex ".*\(${REGEX_VENDORS}\)[^/]*")
 MODFIND=$(for DEV in $(eval "echo /sys/module/*{$COMMA_MODULES}*/drivers/*/*{$COMMA_VENDORS}*"); do test -d "$DEV" && echo "$DEV" || true; done)
-DEVLIST=$(for DEV in $DEVFIND $MODULEFIND; do readlink -f "$DEV"; done | sort | uniq)
+DEVLIST=$(for DEV in $DEVFIND $MODFIND; do readlink -f "$DEV"; done | sort | uniq)
 
 for DEV in $DEVLIST; do
 	echo "     - $DEV..."
@@ -114,8 +114,8 @@ for D in /sys/module/wacom/drivers/usb:wacom/*; do
 	if test -d "$D/input"; then
 		# Temporarily unbind usb:wacom devices so lsusb
 		# can retrieve the HID descriptor
-		echo "     - $DEV..."
 		DEV=$(basename $D)
+		echo "     - $DEV..."
 		BINDLIST="$BINDLIST $DEV"
 		echo -n $DEV > /sys/module/wacom/drivers/usb:wacom/unbind
 	fi
